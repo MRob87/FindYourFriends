@@ -29,8 +29,8 @@ public class MainActivity implements SensorEventListener {
     private Sensor msensor;
     private float[] mGravity = new float[3];
     private float[] mGeomagnetic = new float[3];
-    private float azimuth = 0f;
-    private float currectAzimuth = 0;
+    private float direction = 0f;
+    private float correctDirection = 0;
 
     TextView tvHeading;
 
@@ -64,36 +64,36 @@ public class MainActivity implements SensorEventListener {
             return;
         }
 
-        Log.i(TAG, "will set rotation from " + currectAzimuth + " to " + azimuth);
+        Log.i(TAG, "will set rotation from " + correctDirection + " to " + direction);
 
         String cardinality = "";
 
-        if (azimuth > 330 || azimuth < 30) {
+        if (direction > 330 || direction < 30) {
             cardinality = "N";
-        } else if (azimuth >= 30 && azimuth <= 60) {
+        } else if (direction >= 30 && direction <= 60) {
             cardinality = "NE";
-        } else if (azimuth > 60 && azimuth < 120) {
+        } else if (direction > 60 && direction < 120) {
             cardinality = "E";
-        } else if (azimuth >= 120 && azimuth <= 150) {
+        } else if (direction >= 120 && direction <= 150) {
             cardinality = "SE";
-        } else if (azimuth > 150 && azimuth < 210) {
+        } else if (direction > 150 && direction < 210) {
             cardinality = "S";
-        } else if (azimuth >= 210 && azimuth <= 240) {
+        } else if (direction >= 210 && direction <= 240) {
             cardinality = "SW";
-        } else if (azimuth > 240 && azimuth < 300) {
+        } else if (direction > 240 && direction < 300) {
             cardinality = "W";
-        } else if (azimuth >= 300 && azimuth <= 330) {
+        } else if (direction >= 300 && direction <= 330) {
             cardinality = "NW";
         }
 
 
 
-        tvHeading.setText("Heading: " + Math.round(azimuth) + "\u00b0 " + cardinality);
+        tvHeading.setText("Heading: " + Math.round(direction) + "\u00b0 " + cardinality);
 
-        Animation an = new RotateAnimation(currectAzimuth, azimuth,
+        Animation an = new RotateAnimation(correctDirection, direction,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
                 0.5f);
-        currectAzimuth = azimuth;
+        correctDirection = direction;
 
         an.setDuration(500);
         an.setRepeatCount(0);
@@ -141,10 +141,10 @@ public class MainActivity implements SensorEventListener {
             if (success) {
                 float orientation[] = new float[3];
                 SensorManager.getOrientation(R, orientation);
-                // Log.d(TAG, "azimuth (rad): " + azimuth);
-                azimuth = (float) Math.toDegrees(orientation[0]); // orientation
-                azimuth = (azimuth + 360) % 360;
-                // Log.d(TAG, "azimuth (deg): " + azimuth);
+                // Log.d(TAG, "direction (rad): " + direction);
+                direction = (float) Math.toDegrees(orientation[0]); // orientation
+                direction = (direction + 360) % 360;
+                // Log.d(TAG, "direction (deg): " + direction);
                 adjustArrow();
             }
         }
