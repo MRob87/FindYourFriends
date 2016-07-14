@@ -19,6 +19,8 @@ public class Compass implements SensorEventListener {
     // define the display assembly compass picture
     public ImageView image = null;
 
+    public ImageView guidingDirectionHand;
+
     // device sensor manager
     private SensorManager mSensorManager;
     private Sensor gsensor;
@@ -27,8 +29,12 @@ public class Compass implements SensorEventListener {
     private float[] mGeomagnetic = new float[3];
     private float direction = 0f;
     private float correctDirection = 0;
+    public float guidingDirection = 0;
+    private float correctGuidingDirection = 0;
 
-    TextView tvHeading;
+    public TextView tvHeading;
+
+    public UserLocation userLocation;
 
     public Compass(Context context) {
 
@@ -36,6 +42,10 @@ public class Compass implements SensorEventListener {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         gsensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         msensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+    }
+
+    public float getCorrectDirection() {
+        return correctDirection;
     }
 
     public void start() {
@@ -58,7 +68,9 @@ public class Compass implements SensorEventListener {
             return;
         }
 
-        Log.i(TAG, "will set rotation from " + correctDirection + " to " + direction);
+        if ((correctDirection - direction > .9) || (direction - correctDirection > .9)) {
+            Log.i(TAG, "will set rotation from " + correctDirection + " to " + direction);
+        }
 
         String cardinality = "";
 
@@ -94,6 +106,27 @@ public class Compass implements SensorEventListener {
         an.setFillAfter(true);
 
         image.startAnimation(an);
+
+
+
+        // take heading - bearing = result
+        // if heading > bearing
+        // then 360 - result
+        // else just rotate in direction of result
+        float correctBearing = userLocation.getCorrectBearing();
+
+        guidingDirection = correctBearing - correctDirection;
+
+        an = new RotateAnimation(correctGuidingDirection, guidingDirection,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
+                0.5f);
+        correctGuidingDirection = guidingDirection;
+
+        an.setDuration(500);
+        an.setRepeatCount(0);
+        an.setFillAfter(true);
+
+        guidingDirectionHand.startAnimation(an);
     }
 
     @Override
